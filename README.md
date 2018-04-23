@@ -6,5 +6,8 @@ This script takes a file, does symmetric encryption with the password you provid
 
 ```
 ./ipfs-add-from-encrypted file_to_encrypt.txt
+Password you would like encrypt with
+:
+File encrypted and added to IPFS with this hash QmRzDSsjMAkKfXRkPnMwpcQGnoaKwMaheZPgTrzHkwzP1R
 ```
 

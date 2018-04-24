@@ -1,23 +1,29 @@
-#!/usr/local/bin/python3
+#!/usr/bin/env python3
 # Takes file in does symmetric encryption with the password you provide
 # then  adds it to a running IPFS(ipfs.io) instance.
 #
 import os
-import sys
+import argparse
 import gnupg
 import ipfsapi 
 
-# Get fileToEncrypt argument
-path = sys.argv[1]
+# Parse command arguments
+parser = argparse.ArgumentParser(description='Encrypt file and add it to IPFS')
+parser.add_argument('-i','--input', help='File_To_Encrypt.doc', required=True)
+parser.add_argument('-p','--password', help='Password to encrypt with', required=True)
+args = parser.parse_args()
+
 # Set GPG Home directory
 gpg = gnupg.GPG(homedir='')
 # Get fileToEncrypt full path
-fileToEncrypt = (os.path.abspath(path))
+fileToEncrypt = (os.path.abspath(args.input))
 # Setup encrypted filename to end with.gpg
-encryptedFile = (fileToEncrypt + ".gpg")
+encryptedFile = ("{}.gpg".format(fileToEncrypt))
+# Tell module where IPFS instance is located
+api = ipfsapi.connect('127.0.0.1', 5001)
 
-def encryptFileFunction():
-    passphrase = input("Password you would like encrypt with \n:")
+def encryptFile():
+    passphrase = (args.password)
     with open(fileToEncrypt, 'rb') as f:
         status = gpg.encrypt(f,
             encrypt=False,
@@ -26,9 +32,7 @@ def encryptFileFunction():
             armor=False,
             output=fileToEncrypt + ".gpg")
 
-def ipfsFileFunction(encryptedFile):
-    # Tell module where IPFS instance is located
-    api = ipfsapi.connect('127.0.0.1', 5001)
+def ipfsFile(encryptedFile):
     # Add Encrypted file to IPFS
     ipfsLoadedFile = api.add(encryptedFile)
     # Return Hash of new IPFS File
@@ -36,15 +40,16 @@ def ipfsFileFunction(encryptedFile):
     return ipfsHash
     
 def delEncryptedFile(encryptedFile):
-    if os.path.isfile(encryptedFile):
+    try:
         os.remove(encryptedFile)
-    else:    
-        print("Error: %s file not found" % encryptedFile)
-
+    except:
+        print("Error: %s unable to find or delete file." % encryptedFile)
+        
 def main():
-    encryptFileFunction()
-    ipfsFileFunction(encryptedFile)
-    print ("File encrypted and added to IPFS with this hash " + ipfsFileFunction(encryptedFile))
+    encryptFile()
+    ipfsFile(encryptedFile)
+    print ("File encrypted and added to IPFS with this hash " + ipfsFile(encryptedFile))
     delEncryptedFile(encryptedFile)
 
-main()
+if __name__ == "__main__":    
+    main()

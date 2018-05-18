@@ -33,11 +33,11 @@ def encryptFile():
             output=fileToEncrypt + ".gpg")
 
 def ipfsFile(encryptedFile):
-    # Add Encrypted file to IPFS
-    ipfsLoadedFile = api.add(encryptedFile)
+    # Add encrypted file to IPFS
+    ipfsLoadedFile = api.add(encryptedFile, wrap_with_directory=True)
     # Return Hash of new IPFS File
-    ipfsHash = (ipfsLoadedFile['Hash'])
-    return ipfsHash
+    ipfsHash = (str(ipfsLoadedFile[1]))
+    return(ipfsHash)
     
 def delEncryptedFile(encryptedFile):
     try:

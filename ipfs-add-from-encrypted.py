@@ -6,6 +6,7 @@ import os
 import argparse
 import gnupg
 import ipfsapi 
+import tarfile
 
 # Parse command arguments
 parser = argparse.ArgumentParser(description='Encrypt file and add it to IPFS')

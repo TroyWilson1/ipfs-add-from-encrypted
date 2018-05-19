@@ -36,13 +36,8 @@ def ipfsFile(encryptedFile):
     # Add encrypted file to IPFS
     ipfsLoadedFile = api.add(encryptedFile, wrap_with_directory=True)
     # Return Hash of new IPFS File
-<<<<<<< HEAD
     hashDict = (ipfsLoadedFile[1])
     ipfsHash = (hashDict['Hash'])
-=======
-    fullHash = (ipfsLoadedFile[1])
-    ipfsHash = fullHash['Hash']
->>>>>>> 3eb8636f4487f8cec122d0c0bc23c8ee8b3d761c
     return(ipfsHash)
     
 def delEncryptedFile(encryptedFile):

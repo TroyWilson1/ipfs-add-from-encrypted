@@ -19,9 +19,9 @@ gpg = gnupg.GPG(homedir='')
 # Get dataToEncrypt full path
 dataToEncrypt = (os.path.abspath(args.input))
 # Setup tar filename to end with .tgz
-tarFile = ("{}.bz2".format(dataToEncrypt))
+tarFile = ("{}.tgz".format(dataToEncrypt))
 # Setup encrypted filename to end with .gpg
-encryptedFile = ("{}.bz2.gpg".format(dataToEncrypt))
+encryptedFile = ("{}.tgz.gpg".format(dataToEncrypt))
 # Tell module where IPFS instance is located
 api = ipfsapi.connect('127.0.0.1', 5001)
 
@@ -29,9 +29,9 @@ def dataTar():
     if os.path.isfile(dataToEncrypt):
         return
     else:
-        with tarfile.open(dataToEncrypt + ".bz2",mode='x:bz2') as tar:
+        with tarfile.open(dataToEncrypt + ".tgz",mode='w') as tar:
             tar.add(dataToEncrypt)
-        return
+        tar.close()
 
             
 def encryptFile():
@@ -42,7 +42,7 @@ def encryptFile():
             symmetric='AES256',
             passphrase=passphrase,
             armor=False,
-            output=dataToEncrypt + ".bz2.gpg")
+            output=dataToEncrypt + ".tgz.gpg")
 
 def ipfsFile(encryptedFile):
     # Add encrypted file to IPFS
@@ -50,7 +50,6 @@ def ipfsFile(encryptedFile):
     # Return Hash of new IPFS File
     fullHash = (ipfsLoadedFile[1])
     ipfsHash = fullHash['Hash']
-    #print (ipfsLoadedFile)
     return(ipfsHash)
     
 def delEncryptedFile(encryptedFile):
@@ -62,9 +61,9 @@ def delEncryptedFile(encryptedFile):
 def main():
     dataTar()
     encryptFile()
-    ipfsFile(encryptedFile)
-    print ("File encrypted and added to IPFS with this hash " + ipfsFile(encryptedFile))
-    delEncryptedFile(encryptedFile)
+    #ipfsFile(encryptedFile)
+    #print ("File encrypted and added to IPFS with this hash " + ipfsFile(encryptedFile))
+    #delEncryptedFile(encryptedFile)
 
 if __name__ == "__main__":    
     main()

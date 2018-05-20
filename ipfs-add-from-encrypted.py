@@ -6,7 +6,7 @@ import os
 import argparse
 import gnupg
 import ipfsapi
-import tarfile
+import shutil
 
 # Parse command arguments
 parser = argparse.ArgumentParser(description='Encrypt file/directory and add it to IPFS')
@@ -18,10 +18,10 @@ args = parser.parse_args()
 gpg = gnupg.GPG(homedir='')
 # Get dataToEncrypt full path
 dataToEncrypt = (os.path.abspath(args.input))
-# Setup tar filename to end with .tgz
-tarFile = ("{}.tgz".format(dataToEncrypt))
+# Setup tar filename to end with .zip
+tarFile = ("{}.zip".format(dataToEncrypt))
 # Setup encrypted filename to end with .gpg
-encryptedFile = ("{}.tgz.gpg".format(dataToEncrypt))
+encryptedFile = ("{}.zip.gpg".format(dataToEncrypt))
 # Tell module where IPFS instance is located
 api = ipfsapi.connect('127.0.0.1', 5001)
 
@@ -29,21 +29,29 @@ def dataTar():
     if os.path.isfile(dataToEncrypt):
         return
     else:
-        with tarfile.open(dataToEncrypt + ".tgz",mode='w') as tar:
-            tar.add(dataToEncrypt)
-        tar.close()
-
+        shutil.make_archive(dataToEncrypt, 'zip', dataToEncrypt)
             
 def encryptFile():
     passphrase = (args.password)
-    with open(tarFile, 'rb') as f:
-        status = gpg.encrypt(f,
-            encrypt=False,
-            symmetric='AES256',
-            passphrase=passphrase,
-            armor=False,
-            output=dataToEncrypt + ".tgz.gpg")
+    if os.path.isfile(dataToEncrypt):
+        with open(dataToEncrypt, 'rb') as f:
+            status = gpg.encrypt(f,
+               encrypt=False,
+               symmetric='AES256',
+               passphrase=passphrase,
+               armor=False,
+               output=dataToEncrypt + ".gpg")
 
+    else:
+        with open(tarFile, 'rb') as f:
+            status = gpg.encrypt(f,
+               encrypt=False,
+               symmetric='AES256',
+               passphrase=passphrase,
+               armor=False,
+               output=dataToEncrypt + ".zip.gpg")
+
+            
 def ipfsFile(encryptedFile):
     # Add encrypted file to IPFS
     ipfsLoadedFile = api.add(encryptedFile, wrap_with_directory=True)
@@ -57,7 +65,8 @@ def delEncryptedFile(encryptedFile):
         os.remove(encryptedFile)
     except:
         print("Error: %s unable to find or delete file." % encryptedFile)
-        
+
+    
 def main():
     dataTar()
     encryptFile()

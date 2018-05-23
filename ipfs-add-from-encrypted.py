@@ -6,7 +6,7 @@ import os
 import argparse
 import gnupg
 import ipfsapi
-import shutil
+import tarfile
 
 # Parse command arguments
 parser = argparse.ArgumentParser(description='Encrypt file/directory and add it to IPFS')
@@ -19,9 +19,9 @@ gpg = gnupg.GPG(homedir='')
 # Get dataToEncrypt full path
 dataToEncrypt = (os.path.abspath(args.input))
 # Setup tar filename to end with .zip
-tarFile = ("{}.zip".format(dataToEncrypt))
+tarFile = ("{}.tgz".format(dataToEncrypt))
 # Setup encrypted filename to end with .gpg
-encryptedFile = ("{}.zip.gpg".format(dataToEncrypt))
+encryptedFile = ("{}.tgz.gpg".format(dataToEncrypt))
 # Tell module where IPFS instance is located
 api = ipfsapi.connect('127.0.0.1', 5001)
 
@@ -29,7 +29,10 @@ def dataTar():
     if os.path.isfile(dataToEncrypt):
         return
     else:
-        shutil.make_archive(dataToEncrypt, 'zip', dataToEncrypt)
+        with tarfile.open(tarFile, 'x:gz') as tar:
+            for file in [dataToEncrypt]:
+                tar.add(file)
+            tar.close()
             
 def encryptFile():
     passphrase = (args.password)
@@ -49,7 +52,7 @@ def encryptFile():
                symmetric='AES256',
                passphrase=passphrase,
                armor=False,
-               output=dataToEncrypt + ".zip.gpg")
+               output=dataToEncrypt + ".tgz.gpg")
 
             
 def ipfsFile(encryptedFile):

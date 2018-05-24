@@ -31,7 +31,7 @@ def dataTar():
     if os.path.isfile(dataToEncrypt):
         return
     else:
-        with tarfile.open(tarFile, 'w|') as tar:
+        with tarfile.open(tarFile, 'w') as tar:
             tar.add(dataToEncrypt)
             tar.close()
             
@@ -40,6 +40,7 @@ def encryptFile():
     if os.path.isfile(dataToEncrypt):
         with open(dataToEncrypt, 'rb') as f:
             status = gpg.encrypt(f.read(),
+               None,
                encrypt=False,
                symmetric='AES256',
                passphrase=passphrase,
@@ -49,6 +50,7 @@ def encryptFile():
     else:
         with open(tarFile, 'rb') as f:
             status = gpg.encrypt(f.read(),
+               None,
                encrypt=False,
                symmetric='AES256',
                passphrase=passphrase,
@@ -81,8 +83,8 @@ def delEncryptedFile(encryptedFile):
 def main():
     dataTar()
     encryptFile()
-    #ipfsFile(encryptedFile)
-    #print ("File encrypted and added to IPFS with this hash " + ipfsFile(encryptedFile))
+    ipfsFile(encryptedFile)
+    print ("File encrypted and added to IPFS with this hash " + ipfsFile(encryptedFile))
     delEncryptedFile(encryptedFile)
 
 if __name__ == "__main__":    

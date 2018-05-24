@@ -14,8 +14,6 @@ parser.add_argument('-i','--input', help='File.txt or Directory', required=True)
 parser.add_argument('-p','--password', help='Password to encrypt with', required=True)
 args = parser.parse_args()
 
-# Set GPG Encoding
-gpg.encoding = 'utf-8'
 # Set GPG Home directory
 gpg = gnupg.GPG(homedir='')
 # Set GPG Encoding

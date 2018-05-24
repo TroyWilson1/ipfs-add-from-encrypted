@@ -16,6 +16,8 @@ args = parser.parse_args()
 
 # Set GPG Home directory
 gpg = gnupg.GPG(homedir='')
+# Set GPG Encoding
+gpg.encoding = 'utf-8'
 # Get dataToEncrypt full path
 dataToEncrypt = (os.path.abspath(args.input))
 # Setup tar filename to end with .zip
@@ -29,16 +31,15 @@ def dataTar():
     if os.path.isfile(dataToEncrypt):
         return
     else:
-        with tarfile.open(tarFile, 'x:gz') as tar:
-            for file in [dataToEncrypt]:
-                tar.add(file)
+        with tarfile.open(tarFile, 'w:gz') as tar:
+            tar.add(dataToEncrypt)
             tar.close()
             
 def encryptFile():
     passphrase = (args.password)
     if os.path.isfile(dataToEncrypt):
         with open(dataToEncrypt, 'rb') as f:
-            status = gpg.encrypt(f,
+            status = gpg.encrypt_file(f,
                encrypt=False,
                symmetric='AES256',
                passphrase=passphrase,
@@ -53,6 +54,9 @@ def encryptFile():
                passphrase=passphrase,
                armor=False,
                output=dataToEncrypt + ".tgz.gpg")
+        print ('ok: ', status.ok)
+        print ('status: ', status.status)
+        print ('stderr: ', status.stderr)
 
             
 def ipfsFile(encryptedFile):

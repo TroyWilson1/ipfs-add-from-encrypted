@@ -20,10 +20,10 @@ gpg = gnupg.GPG(homedir='')
 gpg.encoding = 'utf-8'
 # Get dataToEncrypt full path
 dataToEncrypt = (os.path.abspath(args.input))
-# Setup tar filename to end with .zip
-tarFile = ("{}.tgz".format(dataToEncrypt))
+# Setup tar filename to end with .tar
+tarFile = ("{}.tar".format(dataToEncrypt))
 # Setup encrypted filename to end with .gpg
-encryptedFile = ("{}.tgz.gpg".format(dataToEncrypt))
+encryptedFile = ("{}.tar.gpg".format(dataToEncrypt))
 # Tell module where IPFS instance is located
 api = ipfsapi.connect('127.0.0.1', 5001)
 
@@ -31,7 +31,7 @@ def dataTar():
     if os.path.isfile(dataToEncrypt):
         return
     else:
-        with tarfile.open(tarFile, 'w:gz') as tar:
+        with tarfile.open(tarFile, 'w|') as tar:
             tar.add(dataToEncrypt)
             tar.close()
             
@@ -39,7 +39,7 @@ def encryptFile():
     passphrase = (args.password)
     if os.path.isfile(dataToEncrypt):
         with open(dataToEncrypt, 'rb') as f:
-            status = gpg.encrypt_file(f,
+            status = gpg.encrypt(f.read(),
                encrypt=False,
                symmetric='AES256',
                passphrase=passphrase,
@@ -48,15 +48,15 @@ def encryptFile():
 
     else:
         with open(tarFile, 'rb') as f:
-            status = gpg.encrypt(f,
+            status = gpg.encrypt(f.read(),
                encrypt=False,
                symmetric='AES256',
                passphrase=passphrase,
                armor=False,
-               output=dataToEncrypt + ".tgz.gpg")
-        print ('ok: ', status.ok)
-        print ('status: ', status.status)
-        print ('stderr: ', status.stderr)
+               output=dataToEncrypt + ".tar.gpg")
+        #print ('ok: ', status.ok)
+        #print ('status: ', status.status)
+        #print ('stderr: ', status.stderr)
 
             
 def ipfsFile(encryptedFile):
@@ -72,6 +72,10 @@ def delEncryptedFile(encryptedFile):
         os.remove(encryptedFile)
     except:
         print("Error: %s unable to find or delete file." % encryptedFile)
+    try:
+        os.remove(tarFile)
+    except:
+        print("Error: %s unable to find or delete file." % tarFile)
 
     
 def main():
@@ -79,7 +83,7 @@ def main():
     encryptFile()
     #ipfsFile(encryptedFile)
     #print ("File encrypted and added to IPFS with this hash " + ipfsFile(encryptedFile))
-    #delEncryptedFile(encryptedFile)
+    delEncryptedFile(encryptedFile)
 
 if __name__ == "__main__":    
     main()

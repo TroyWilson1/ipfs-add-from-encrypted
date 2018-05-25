@@ -57,11 +57,7 @@ def encryptFile():
                passphrase=passphrase,
                armor=False,
                output=dataToEncrypt + ".tar.gpg")
-        #print ('ok: ', status.ok)
-        #print ('status: ', status.status)
-        #print ('stderr: ', status.stderr)
 
-            
 def ipfsFile(encryptedFile):
     # Add encrypted file to IPFS
     ipfsLoadedFile = api.add(encryptedFile, wrap_with_directory=True)

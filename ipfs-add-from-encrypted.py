@@ -23,7 +23,9 @@ dataToEncrypt = (os.path.abspath(args.input))
 # Setup tar filename to end with .tar
 tarFile = ("{}.tar".format(dataToEncrypt))
 # Setup encrypted filename to end with .gpg
-encryptedFile = ("{}.tar.gpg".format(dataToEncrypt))
+encryptedFile = ("{}.gpg".format(dataToEncrypt))
+# Setup encrypted tar directory to end with .tar.gpg
+tarEncryptedFile = ("{}.tar.gpg".format(dataToEncrypt))
 # Tell module where IPFS instance is located
 api = ipfsapi.connect('127.0.0.1', 5001)
 
@@ -59,30 +61,36 @@ def encryptFile():
                output=dataToEncrypt + ".tar.gpg")
 
 def ipfsFile(encryptedFile):
-    # Add encrypted file to IPFS
-    ipfsLoadedFile = api.add(encryptedFile, wrap_with_directory=True)
-    # Return Hash of new IPFS File
-    fullHash = (ipfsLoadedFile[1])
-    ipfsHash = fullHash['Hash']
-    return(ipfsHash)
+    try:
+        # Add encrypted file to IPFS
+        ipfsLoadedFile = api.add(encryptedFile, wrap_with_directory=True)
+        # Return Hash of new IPFS File
+        fullHash = (ipfsLoadedFile[1])
+        ipfsHash = fullHash['Hash']
+        return(ipfsHash)
+    except:
+        # Add encrypted directory to IPFS
+        ipfsLoadedFile = api.add(tarEncryptedFile, wrap_with_directory=True)
+        # Return Hash of new IPFS File
+        fullHash = (ipfsLoadedFile[1])
+        ipfsHash = fullHash['Hash']
+        return(ipfsHash)
+        
     
-def delEncryptedFile(encryptedFile):
-    try:
+def delEncryptedFile():
+    if os.path.isfile(encryptedFile):
         os.remove(encryptedFile)
-    except:
-        print("Error: %s unable to find or delete file." % encryptedFile)
-    try:
+    elif os.path.isfile(tarFile):
         os.remove(tarFile)
-    except:
-        print("Error: %s unable to find or delete file." % tarFile)
-
+        os.remove(tarEncryptedFile)
+        
     
 def main():
     dataTar()
     encryptFile()
     ipfsFile(encryptedFile)
     print ("File encrypted and added to IPFS with this hash " + ipfsFile(encryptedFile))
-    delEncryptedFile(encryptedFile)
+    delEncryptedFile()
 
 if __name__ == "__main__":    
     main()

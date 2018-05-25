@@ -10,7 +10,7 @@ File encrypted and added to IPFS with this hash QmYjK5jHgYSyeyKZqDZyLCzrziphB18w
 ```
 ### Add Directory:
 ````
-./ipfs-add-from-encrypted.py -I /home/testing/stuff -p P@ssword
+./ipfs-add-from-encrypted.py -i /home/testing/stuff -p P@ssword
 File encrypted and added to IPFS with this hash QmYjK5jHgYSyeyKZqDZyLCzrziphB18wuM93mXtySEryD1
 ````
 

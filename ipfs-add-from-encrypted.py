@@ -32,6 +32,7 @@ def dataTar():
         return
     else:
         with tarfile.open(tarFile, 'w') as tar:
+            tar.dereference=False
             tar.add(dataToEncrypt)
             tar.close()
             

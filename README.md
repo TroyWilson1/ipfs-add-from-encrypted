@@ -1,6 +1,6 @@
 # ipfs-add-from-encrypted
 
-This script takes a file as input, uses GPG AES256 symmetric encryption with the password you provide and adds it to IPFS and returns the IPFS hash. 
+This script takes a file or directroy as input, uses tar if a directory and GPG AES256 symmetric encryption with the password you provide and adds it to IPFS and returns the IPFS hash. 
 
 ## USAGE:
 ```
@@ -17,7 +17,7 @@ Encrypt file and add it to IPFS
 optional arguments:
   -h, --help            show this help message and exit
   -i INPUT, --input INPUT
-                        File_To_Encrypt.doc
+                        file.doc or directory
   -p PASSWORD, --password PASSWORD
                         Password to encrypt with
 ```

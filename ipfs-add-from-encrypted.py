@@ -85,9 +85,9 @@ def delEncryptedFile():
         os.remove(tarFile)
         os.remove(tarEncryptedFile)
 
-def clusterAdd():
+def clusterAdd(ipfsHash):
      if args.cluster:
-        print (ipfsFile)
+        print (ipfsHash)
         #completed = subprocess.run(
         #['ipfs-cluster-ctl', 'pin', 'add', ipfsFile(encryptedFile) ],
         #stdout=subprocess.PIPE,
@@ -104,9 +104,9 @@ def main():
     encryptFile()
     ipfsFile(encryptedFile)
     print ("File encrypted and added to IPFS with this hash " + ipfsFile(encryptedFile))
-    delEncryptedFile()
     clusterAdd()
-
+    delEncryptedFile()
+    
     
 if __name__ == "__main__":    
     main()

@@ -68,15 +68,15 @@ def ipfsFile(encryptedFile):
         ipfsLoadedFile = api.add(encryptedFile, wrap_with_directory=True)
         # Return Hash of new IPFS File
         fullHash = (ipfsLoadedFile[1])
-        ipfsHash = fullHash['Hash']
-        return(ipfsHash)
+        ipfsFile.ipfsHash = fullHash['Hash']
+        return(ipfsFile.ipfsHash)
     except:
         # Add encrypted directory to IPFS
         ipfsLoadedFile = api.add(tarEncryptedFile, wrap_with_directory=True)
         # Return Hash of new IPFS File
         fullHash = (ipfsLoadedFile[1])
-        ipfsHash = fullHash['Hash']
-        return(ipfsHash)
+        ipfsFile.ipfsHash = fullHash['Hash']
+        return(ipfsFile.ipfsHash)
     
 def delEncryptedFile():
     if os.path.isfile(encryptedFile):
@@ -85,19 +85,15 @@ def delEncryptedFile():
         os.remove(tarFile)
         os.remove(tarEncryptedFile)
 
-def clusterAdd(ipfsHash):
+def clusterAdd():
      if args.cluster:
-        print (ipfsHash)
-        #completed = subprocess.run(
-        #['ipfs-cluster-ctl', 'pin', 'add', ipfsFile(encryptedFile) ],
-        #stdout=subprocess.PIPE,
-    #)
-    
-    #print('Have {} bytes in stdout:\n{}'.format(
-    #    len(completed.stdout),
-    #    completed.stdout.decode('utf-8'))
-    #)
-
+        completed = subprocess.run(
+            ['ipfs-cluster-ctl', 'pin', 'add', ipfsFile.ipfsHash ],
+            shell = True,
+            stdout=subprocess.PIPE,
+        )
+        print(completed)
+        #print("Hash: " + ipfsFile.ipfsHash + " has been added to the cluster.")
     
 def main():
     dataTar()

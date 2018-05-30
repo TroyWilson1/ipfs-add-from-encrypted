@@ -15,7 +15,7 @@ File encrypted and added to IPFS with this hash QmYjK5jHgYSyeyKZqDZyLCzrziphB18w
 ````
 
 ## Help:
-```
+````
 usage: ipfs-add-from-encrypted.py [-h] -i INPUT -p PASSWORD
 
 Encrypt file and add it to IPFS
@@ -26,4 +26,4 @@ optional arguments:
                         file.doc or directory
   -p PASSWORD, --password PASSWORD
                         Password to encrypt with
-```
+````

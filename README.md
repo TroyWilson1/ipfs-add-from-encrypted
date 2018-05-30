@@ -9,13 +9,13 @@ This script takes a file or directroy as input, uses tar if a directory and GPG 
 File encrypted and added to IPFS with this hash QmYjK5jHgYSyeyKZqDZyLCzrziphB18wuM93mXtySEryD1
 ```
 ### Add Directory:
-````
+```
 ./ipfs-add-from-encrypted.py -i /home/testing/stuff -p P@ssword
 File encrypted and added to IPFS with this hash QmYjK5jHgYSyeyKZqDZyLCzrziphB18wuM93mXtySEryD1
-````
+```
 
 ## Help:
-````
+```
 usage: ipfs-add-from-encrypted.py [-h] -i INPUT -p PASSWORD
 
 Encrypt file and add it to IPFS
@@ -26,4 +26,4 @@ optional arguments:
                         file.doc or directory
   -p PASSWORD, --password PASSWORD
                         Password to encrypt with
-````
+```

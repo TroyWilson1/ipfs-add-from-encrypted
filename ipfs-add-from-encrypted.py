@@ -7,13 +7,11 @@ import argparse
 import gnupg
 import ipfsapi
 import tarfile
-import subprocess
 
 # Parse command arguments
 parser = argparse.ArgumentParser(description='Encrypt file/directory and add it to IPFS')
 parser.add_argument('-i','--input', help='File.txt or Directory', required=True)
 parser.add_argument('-p','--password', help='Password to encrypt with', required=True)
-parser.add_argument('-c','--cluster', help='Add hash to ipfs-cluster-ctl', action="store_true")
 args = parser.parse_args()
 
 # Set GPG Home directory
@@ -85,22 +83,11 @@ def delEncryptedFile():
         os.remove(tarFile)
         os.remove(tarEncryptedFile)
 
-def clusterAdd():
-     if args.cluster:
-        completed = subprocess.run(
-            ['ipfs-cluster-ctl', 'pin', 'add', ipfsFile.ipfsHash ],
-            shell = True,
-            stdout=subprocess.PIPE,
-        )
-        print(completed)
-        #print("Hash: " + ipfsFile.ipfsHash + " has been added to the cluster.")
-    
 def main():
     dataTar()
     encryptFile()
     ipfsFile(encryptedFile)
     print ("File encrypted and added to IPFS with this hash " + ipfsFile(encryptedFile))
-    clusterAdd()
     delEncryptedFile()
     
     

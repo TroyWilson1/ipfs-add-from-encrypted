@@ -12,6 +12,7 @@ import tarfile
 parser = argparse.ArgumentParser(description='Encrypt file/directory and add it to IPFS')
 parser.add_argument('-i','--input', help='File.txt or Directory', required=True)
 parser.add_argument('-p','--password', help='Password to encrypt with', required=True)
+parser.add_argument('-n','--name', help='Set Encrypted filename')
 args = parser.parse_args()
 
 # Set GPG Home directory
@@ -26,51 +27,69 @@ tarFile = ("{}.tar".format(dataToEncrypt))
 encryptedFile = ("{}.gpg".format(dataToEncrypt))
 # Setup encrypted tar directory to end with .tar.gpg
 tarEncryptedFile = ("{}.tar.gpg".format(dataToEncrypt))
+
+# Setup Renamed File
+fileReady = (args.name)
+# Setup Renamed Tar File
+renamedTar = (args.name)
+#
+fileReadyOut = ("{}.gpg".format(fileReady))
+
+
 # Tell module where IPFS instance is located
 api = ipfsapi.connect('127.0.0.1', 5001)
 
+
+def nameSet():
+    if args.name:
+        os.rename(dataToEncrypt, fileReady)
+        
+    else:
+        os.rename(dataToEncrypt, fileReady)
+        
+            
 def dataTar():
-    if os.path.isfile(dataToEncrypt):
+    if os.path.isfile(fileReady):
         return
     else:
-        with tarfile.open(tarFile, 'w') as tar:
+        with tarfile.open(tarReady, 'w') as tar:
             tar.dereference=False
-            tar.add(dataToEncrypt)
+            tar.add(tarReady)
             tar.close()
-            
+
 def encryptFile():
     passphrase = (args.password)
-    if os.path.isfile(dataToEncrypt):
-        with open(dataToEncrypt, 'rb') as f:
+    if os.path.isfile(fileReady):
+        with open(fileReady, 'rb') as f:
             status = gpg.encrypt(f.read(),
                None,
                encrypt=False,
                symmetric='AES256',
                passphrase=passphrase,
                armor=False,
-               output=dataToEncrypt + ".gpg")
+               output=fileReady + ".gpg")
 
     else:
-        with open(tarFile, 'rb') as f:
+        with open(tarReady, 'rb') as f:
             status = gpg.encrypt(f.read(),
                None,
                encrypt=False,
                symmetric='AES256',
                passphrase=passphrase,
                armor=False,
-               output=dataToEncrypt + ".tar.gpg")
+               output=tarReady + ".tar.gpg")
 
 def ipfsFile(encryptedFile):
     try:
         # Add encrypted file to IPFS
-        ipfsLoadedFile = api.add(encryptedFile, wrap_with_directory=True)
+        ipfsLoadedFile = api.add(fileReadyOut, wrap_with_directory=True)
         # Return Hash of new IPFS File
         fullHash = (ipfsLoadedFile[1])
         ipfsFile.ipfsHash = fullHash['Hash']
         return(ipfsFile.ipfsHash)
     except:
         # Add encrypted directory to IPFS
-        ipfsLoadedFile = api.add(tarEncryptedFile, wrap_with_directory=True)
+        ipfsLoadedFile = api.add(tarReady, wrap_with_directory=True)
         # Return Hash of new IPFS File
         fullHash = (ipfsLoadedFile[1])
         ipfsFile.ipfsHash = fullHash['Hash']
@@ -84,11 +103,12 @@ def delEncryptedFile():
         os.remove(tarEncryptedFile)
 
 def main():
+    nameSet()
     dataTar()
     encryptFile()
     ipfsFile(encryptedFile)
     print ("File encrypted and added to IPFS with this hash " + ipfsFile(encryptedFile))
-    delEncryptedFile()
+    #delEncryptedFile()
     
     
 if __name__ == "__main__":    

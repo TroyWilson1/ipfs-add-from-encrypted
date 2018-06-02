@@ -4,85 +4,39 @@
 #
 import os
 import argparse
-import gnupg
 import ipfsapi
-import tarfile
+import subprocess
 
 # Parse command arguments
 parser = argparse.ArgumentParser(description='Encrypt file/directory and add it to IPFS')
 parser.add_argument('-i','--input', help='File.txt or Directory', required=True)
-parser.add_argument('-p','--password', help='Password to encrypt with', required=True)
-parser.add_argument('-n','--name', help='Set Encrypted filename')
+parser.add_argument('-n','--name', help='Set encrypted output filename', required=True)
 args = parser.parse_args()
 
-# Set GPG Home directory
-gpg = gnupg.GPG(homedir='')
-# Set GPG Encoding
-gpg.encoding = 'utf-8'
 # Get dataToEncrypt full path
 dataToEncrypt = (os.path.abspath(args.input))
-# Setup tar filename to end with .tar
-tarFile = ("{}.tar".format(dataToEncrypt))
-# Setup encrypted filename to end with .gpg
-encryptedFile = ("{}.gpg".format(dataToEncrypt))
-# Setup encrypted tar directory to end with .tar.gpg
-tarEncryptedFile = ("{}.tar.gpg".format(dataToEncrypt))
 
-# Setup Renamed File
-fileReady = (args.name)
-# Setup Renamed Tar File
-renamedTar = (args.name)
-#
-fileReadyOut = ("{}.gpg".format(fileReady))
-
+# File
+fileReady = (args.name + ".gpg")
+# Tar
+tarReady = (args.name + ".tgz.gpg")
 
 # Tell module where IPFS instance is located
 api = ipfsapi.connect('127.0.0.1', 5001)
 
 
-def nameSet():
-    if args.name:
-        os.rename(dataToEncrypt, fileReady)
-        
+def packageData():
+    if os.path.isfile(dataToEncrypt):
+        subprocess.run(["gpg", "-o", args.name + ".gpg", "-c", dataToEncrypt])
     else:
-        os.rename(dataToEncrypt, fileReady)
-        
-            
-def dataTar():
-    if os.path.isfile(fileReady):
-        return
-    else:
-        with tarfile.open(tarReady, 'w') as tar:
-            tar.dereference=False
-            tar.add(tarReady)
-            tar.close()
+        ps = subprocess.Popen(("tar", "-cz", dataToEncrypt),stdout=subprocess.PIPE)
+        output = subprocess.check_output(("gpg", "-c", "-o", args.name + ".tgz.gpg"), stdin=ps.stdout)
+        ps.wait() 
 
-def encryptFile():
-    passphrase = (args.password)
-    if os.path.isfile(fileReady):
-        with open(fileReady, 'rb') as f:
-            status = gpg.encrypt(f.read(),
-               None,
-               encrypt=False,
-               symmetric='AES256',
-               passphrase=passphrase,
-               armor=False,
-               output=fileReady + ".gpg")
-
-    else:
-        with open(tarReady, 'rb') as f:
-            status = gpg.encrypt(f.read(),
-               None,
-               encrypt=False,
-               symmetric='AES256',
-               passphrase=passphrase,
-               armor=False,
-               output=tarReady + ".tar.gpg")
-
-def ipfsFile(encryptedFile):
+def ipfsFile():
     try:
         # Add encrypted file to IPFS
-        ipfsLoadedFile = api.add(fileReadyOut, wrap_with_directory=True)
+        ipfsLoadedFile = api.add(fileReady, wrap_with_directory=True)
         # Return Hash of new IPFS File
         fullHash = (ipfsLoadedFile[1])
         ipfsFile.ipfsHash = fullHash['Hash']
@@ -96,19 +50,17 @@ def ipfsFile(encryptedFile):
         return(ipfsFile.ipfsHash)
     
 def delEncryptedFile():
-    if os.path.isfile(encryptedFile):
-        os.remove(encryptedFile)
-    elif os.path.isfile(tarFile):
-        os.remove(tarFile)
-        os.remove(tarEncryptedFile)
+    if os.path.isfile(fileReady):
+        os.remove(fileReady)
+    elif os.path.isfile(tarReady):
+        os.remove(tarReady)
+
 
 def main():
-    nameSet()
-    dataTar()
-    encryptFile()
-    ipfsFile(encryptedFile)
-    print ("File encrypted and added to IPFS with this hash " + ipfsFile(encryptedFile))
-    #delEncryptedFile()
+    packageData()
+    ipfsFile()
+    print ("File encrypted and added to IPFS with this hash " + ipfsFile.ipfsHash)
+    delEncryptedFile()
     
     
 if __name__ == "__main__":    

@@ -48,13 +48,12 @@ def ipfsFile():
         fullHash = (ipfsLoadedFile[1])
         ipfsFile.ipfsHash = fullHash['Hash']
         return(ipfsFile.ipfsHash)
-    
+
 def delEncryptedFile():
     if os.path.isfile(fileReady):
         os.remove(fileReady)
     elif os.path.isfile(tarReady):
         os.remove(tarReady)
-
 
 def main():
     packageData()

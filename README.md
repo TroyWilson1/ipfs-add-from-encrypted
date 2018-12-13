@@ -2,6 +2,8 @@
 
 This script takes a file or directroy as input, uses tar if a directory and GPG AES256 symmetric encryption with the password you provide and adds it to IPFS and returns the IPFS hash. 
 
+I use this on a Macbook Pro with GPG.
+
 ## USAGE:
 ### Add Single File:
 ```

@@ -67,6 +67,7 @@ def main():
     packageData()
     ipfsFile()
     print ("File encrypted and added to IPFS with this hash " + ipfsFile.ipfsHash)
+    print ("Be sure to use secure messaging like Signal.org or Keybase.io to send the password to the file recipient.")
     delEncryptedFile()
     
     

@@ -21,10 +21,16 @@ fileReady = (args.name + ".gpg")
 # Tar
 tarReady = (args.name + ".tgz.gpg")
 
-# Tell module where IPFS instance is located
-api = ipfsapi.connect('127.0.0.1', 5001)
 
-
+def ipfsConnect():
+    # Tell module where IPFS instance is located
+    try:
+        api = ipfsapi.connect('127.0.0.1', 5001)
+        print("IPFS is Ready!")
+    except:
+        print("IPFS Daemon not running!")
+        quit()
+        
 def packageData():
     if os.path.isfile(dataToEncrypt):
         subprocess.run(["gpg", "-o", args.name + ".gpg", "-c", dataToEncrypt])
@@ -56,6 +62,7 @@ def delEncryptedFile():
         os.remove(tarReady)
 
 def main():
+    ipfsConnect()
     packageData()
     ipfsFile()
     print ("File encrypted and added to IPFS with this hash " + ipfsFile.ipfsHash)

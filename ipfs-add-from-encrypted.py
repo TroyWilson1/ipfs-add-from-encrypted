@@ -26,7 +26,7 @@ def ipfsConnect():
     # Tell module where IPFS instance is located
     try:
         api = ipfsapi.connect('127.0.0.1', 5001)
-        print("IPFS is Ready!")
+        return(api)
     except:
         print("IPFS Daemon not running!")
         quit()
@@ -41,6 +41,7 @@ def packageData():
 
 def ipfsFile():
     try:
+        api = ipfsConnect()
         # Add encrypted file to IPFS
         ipfsLoadedFile = api.add(fileReady, wrap_with_directory=True)
         # Return Hash of new IPFS File
